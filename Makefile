@@ -1,11 +1,13 @@
 .PHONY: install test lint format run help 
 
-PYTEST:= poetry run pytest
-UVICORN:= poetry run uvicorn
-RUFF:= poetry run ruff
+BACKEND_DIR := backend
+POETRY := poetry -C $(BACKEND_DIR)
+PYTEST:= $(POETRY) run pytest
+UVICORN:= $(POETRY) run uvicorn
+RUFF:= $(POETRY) run ruff
 
 install:
-	poetry install
+	$(POETRY) install
 
 test:
 	$(PYTEST)
