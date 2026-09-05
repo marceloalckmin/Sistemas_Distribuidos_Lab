@@ -1,9 +1,0 @@
-# cache
-./pytest_cache
-__pycache__/
-
-# ambiente e IDEs
-.env
-.venv/
-venv/
-.vscode/
