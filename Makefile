@@ -12,7 +12,10 @@ install:
 
 test:
 	$(PYTEST)
-	
+
+test:
+	$(PYTEST) -v
+
 lint:
 	$(RUFF) check .
 
@@ -47,6 +50,7 @@ help:
 	@echo "Comandos disponíveis:"
 	@echo "  make install  - instala dependências"	
 	@echo "  make test     - executa testes"
+	@echo "  make test-verbose - executa testes mostrando mais informações dos resultados"
 	@echo "  make lint     - verifica o código"
 	@echo "  make format   - formata o código"
 	@echo "  make run      - inicia o servidor"
