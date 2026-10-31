@@ -1,7 +1,11 @@
 name: CI
 
 on:
+<<<<<<< HEAD
   push:g
+=======
+  push:
+>>>>>>> ee001712ffceee9594e171743973b2fb56503874
   pull_request:
 
 jobs:
