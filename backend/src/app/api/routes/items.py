@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.schemas.item import Item
+from backend.src.app.api.schemas.item import Item
 
 router = APIRouter(prefix="/items", tags=["Items"])
 
