@@ -11,9 +11,6 @@ install:
 	$(POETRY) install
 
 test:
-	$(PYTEST)
-
-test:
 	$(PYTEST) -v
 
 lint:
@@ -45,6 +42,15 @@ logs:
 
 api-logs:
 	$(COMPOSE) logs -f api
+
+db-upgrade:
+	$(POETRY) run alembic upgrade head
+
+db-migration:
+	$(POETRY) run alembic revision --autogenerate -m "$(msg)"
+
+db-current:
+	$(POETRY) run alembic current
 
 help:
 	@echo "Comandos disponíveis:"

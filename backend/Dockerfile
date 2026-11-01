@@ -2,13 +2,19 @@ FROM python:3.14-slim
 
 WORKDIR /app
 
-COPY backend/pyproject.toml backend/poetry.lock ./
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app
+
+COPY pyproject.toml poetry.lock ./
 
 RUN pip install --no-cache-dir poetry \
     && poetry config virtualenvs.create false \
     && poetry install --only main --no-interaction --no-ansi
 
-COPY backend/app ./app
+COPY alembic.ini ./
+COPY alembic ./alembic
+COPY src/app ./app
 
 EXPOSE 8000
 
