@@ -1,6 +1,7 @@
-.PHONY: install test lint format run help 
+.PHONY: install test lint format run help up build down clean ps logs api-logs db-upgrade db-migration db-current frontend-install frontend-dev frontend-lint frontend-format frontend-check frontend-test frontend-test-e2e frontend-build check-all
 
 BACKEND_DIR := backend
+NPM := npm --prefix frontend
 POETRY := poetry -C $(BACKEND_DIR)
 PYTEST:= $(POETRY) run pytest
 UVICORN:= $(POETRY) run uvicorn --app-dir src
@@ -51,6 +52,34 @@ db-migration:
 
 db-current:
 	$(POETRY) run alembic current
+
+frontend-install:
+	$(NPM) ci
+
+frontend-dev:
+	$(NPM) run dev
+
+frontend-lint:
+	$(NPM) run lint
+
+frontend-format:
+	$(NPM) run format
+
+frontend-check:
+	$(NPM) run lint
+	$(NPM) run format:check
+
+frontend-test:
+	$(NPM) run test
+
+frontend-test-e2e:
+	$(NPM) run test:e2e
+
+frontend-build:
+	$(NPM) run build
+
+check-all: 
+	lint test frontend-check frontend-test frontend-build frontend-test-e2e
 
 help:
 	@echo "Comandos disponíveis:"
