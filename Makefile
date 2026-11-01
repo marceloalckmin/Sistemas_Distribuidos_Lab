@@ -46,6 +46,15 @@ logs:
 api-logs:
 	$(COMPOSE) logs -f api
 
+db-upgrade:
+	cd backend && poetry run alembic upgrade head
+
+db-migration:
+	cd backend && poetry run alembic revision --autogenerate -m "$(msg)"
+
+db-current:
+	cd backend && poetry run alembic current
+
 help:
 	@echo "Comandos disponíveis:"
 	@echo "  make install  - instala dependências"	

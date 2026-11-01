@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.schemas.item import Item
+from app.schemas.item import ItemCreate
 
 router = APIRouter(prefix="/items", tags=["Items"])
 
@@ -12,15 +12,15 @@ def get_item(id: int):
     return {"id": id, "name": f"Item {id}", "price": 10.0}
 
 @router.post("/")
-def create_item(item: Item):
+def create_item(item: ItemCreate):
     return item
 
 @router.patch("/{item_id}/{price}")
-def replace_item(item_id: int, item: Item, price: float):
+def replace_item(item_id: int, item: ItemCreate, price: float):
     return {"id": item_id, "name": item.name, "price": price}
 
 @router.put("/{item_id}")
-def replace_item(item_id: int, item: Item):
+def replace_item(item_id: int, item: ItemCreate):
     return {"id": item_id, "name": item.name, "price": item.price}
 
 @router.delete("/{item_id}")
