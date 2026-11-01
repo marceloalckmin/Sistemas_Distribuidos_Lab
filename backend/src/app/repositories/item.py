@@ -5,10 +5,8 @@ from app.models.item import Item
 
 
 class ItemRepository:
-
     def __init__(self, db: Session):
         self.db = db
-
 
     def create(self, name: str, price: float | None) -> Item:
         item = Item(name=name, price=price)
@@ -17,19 +15,15 @@ class ItemRepository:
         self.db.refresh(item)
         return item
 
-
     def get_by_id(self, item_id: int) -> Item | None:
         return self.db.get(Item, item_id)
-
 
     def get_by_name(self, name: str) -> Item | None:
         return self.db.scalar(select(Item).where(Item.name == name))
 
-
     def get_items(self) -> list[Item]:
         statement = select(Item).order_by(Item.id)
         return list(self.db.scalars(statement))
-
 
     def update(self, item: Item, changes: dict) -> Item:
         for field, value in changes.items():
@@ -37,7 +31,6 @@ class ItemRepository:
         self.db.commit()
         self.db.refresh(item)
         return item
-
 
     def delete(self, item: Item) -> None:
         self.db.delete(item)

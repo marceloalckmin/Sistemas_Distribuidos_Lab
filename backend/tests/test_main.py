@@ -1,11 +1,11 @@
-import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
 
-@pytest.fixture
+
 def client():
     return TestClient(app)
+
 
 """
 testes antigos
@@ -40,45 +40,106 @@ def test_rotas_inexistentes_retornam_404(client):
     assert response.status_code == 404
 """
 
-def test_list_items(client):
+
+def create(client, name="Cafe", price=12.5):
+    return client.post("/items/", json={"name": name, "price": price})
+
+
+def test_list_items_empty(client):
     response = client.get("/items/")
 
     assert response.status_code == 200
-    assert isinstance(response.json(), list)
-
-@pytest.mark.parametrize("item_id", [1, 2, 3])
-def test_get_item_by_id(client, item_id):
-    response = client.get(f"/items/{item_id}")
-
-    assert response.status_code == 200
-    assert response.json()["id"] == item_id
+    assert response.json() == []
 
 
 def test_create_item(client):
-    payload = {"name": "Café", "price": 10.0}
-    response = client.post("/items/", json=payload)
+    response = create(client)
+
+    assert response.status_code == 201
+    assert response.json() == {"id": 1, "name": "Cafe", "price": 12.5}
+
+
+def test_create_item_invalid(client):
+    response = client.post("/items/", json={"price": 1.0})
+
+    assert response.status_code == 422
+
+
+def test_create_item_duplicate_name(client):
+    create(client)
+    response = create(client)
+
+    assert response.status_code == 409
+
+
+def test_list_items_after_create(client):
+    create(client, "Cafe")
+    create(client, "Cha")
+
+    response = client.get("/items/")
 
     assert response.status_code == 200
-    assert response.json()["name"] == "Café"
+    assert [i["name"] for i in response.json()] == ["Cafe", "Cha"]
 
-def test_delete_item(client):
-    response = client.delete("/items/5")
+
+def test_get_item_by_id(client):
+    item_id = create(client).json()["id"]
+
+    response = client.get(f"/items/{item_id}")
 
     assert response.status_code == 200
+    assert response.json()["name"] == "Cafe"
+
+
+def test_get_item_not_found(client):
+    response = client.get("/items/9999")
+
+    assert response.status_code == 404
+
+
+def test_get_item_invalid_id(client):
+    response = client.get("/items/abc")
+
+    assert response.status_code == 422
+
 
 def test_replace_item(client):
-    payload = {"name": "Café", "price": 12.5}
-    response = client.put("/items/5", json=payload)
+    item_id = create(client).json()["id"]
+
+    response = client.put(f"/items/{item_id}", json={"name": "Novo", "price": 1.0})
 
     assert response.status_code == 200
-    assert response.json() == {"id": 5, "name": "Café", "price": 12.5}
+    assert response.json() == {"id": item_id, "name": "Novo", "price": 1.0}
 
-def test_patch_item(client):
-    payload = {"name": "Café", "price": 1.0}
-    response = client.patch("/items/5/20.5", json=payload)
+
+def test_replace_item_not_found(client):
+    response = client.put("/items/9999", json={"name": "X", "price": 1.0})
+
+    assert response.status_code == 404
+
+
+def test_patch_item_keeps_other_fields(client):
+    item_id = create(client).json()["id"]
+
+    response = client.patch(f"/items/{item_id}", json={"price": 20.0})
 
     assert response.status_code == 200
-    assert response.json() == {"id": 5, "name": "Café", "price": 20.5}
+    assert response.json() == {"id": item_id, "name": "Cafe", "price": 20.0}
+
+
+def test_delete_item(client):
+    item_id = create(client).json()["id"]
+
+    response = client.delete(f"/items/{item_id}")
+
+    assert response.status_code == 204
+    assert client.get(f"/items/{item_id}").status_code == 404
+
+
+def test_delete_item_not_found(client):
+    response = client.delete("/items/9999")
+
+    assert response.status_code == 404
 
 
 def soma(a, b):

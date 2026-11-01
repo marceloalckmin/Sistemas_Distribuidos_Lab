@@ -11,9 +11,6 @@ install:
 	$(POETRY) install
 
 test:
-	$(PYTEST)
-
-test:
 	$(PYTEST) -v
 
 lint:

@@ -1,7 +1,9 @@
 from collections.abc import Iterator
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
-from backend.src.app.core.config import DATABASE_URL
+
+from app.core.config import DATABASE_URL
 
 engine = create_engine(DATABASE_URL, pool_pre_ping=True)
 
