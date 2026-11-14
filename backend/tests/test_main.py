@@ -1,42 +1,33 @@
-from fastapi.testclient import TestClient
-
-from app.main import app
-
-
-def client():
-    return TestClient(app)
-
-
 """
 testes antigos
 def test_home_retorna_200(client):
     response = client.get("/")
- 
+
     assert response.status_code == 200
- 
- 
+
+
 def test_home_retorna_mensagem(client):
     response = client.get("/")
- 
+
     assert response.json() == {"message": "Olá, Sistemas Distribuídos!"}
- 
+
 @pytest.mark.parametrize("nome", ["Marcelo", "Maria", "João"])
 def test_hello_com_nome(client, nome):
     response = client.get(f"/hello/{nome}")
- 
+
     assert response.status_code == 200
     assert response.json() == {"message": f"Olá, {nome}!"}
- 
- 
+
+
 def test_status_online(client):
     response = client.get("/status")
- 
+
     assert response.status_code == 200
     assert response.json() == {"status": "online"}
 
 def test_rotas_inexistentes_retornam_404(client):
     response = client.get("/sadfasdfsadfasdfasfqw")
- 
+
     assert response.status_code == 404
 """
 
@@ -148,3 +139,36 @@ def soma(a, b):
 
 def test_soma():
     assert soma(2, 3) == 5
+
+
+def test_cors_allows_frontend_origin(client):
+    response = client.options(
+        "/items/",
+        headers={
+            "Origin": "http://localhost:5173",
+            "Access-Control-Request-Method": "POST",
+            "Access-Control-Request-Headers": "content-type",
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.headers["access-control-allow-origin"] == "http://localhost:5173"
+
+
+def test_cors_blocks_unknown_origin(client):
+    response = client.get("/items/", headers={"Origin": "http://evil.example"})
+
+    assert response.status_code == 200
+    assert "access-control-allow-origin" not in response.headers
+
+
+def test_create_item_rejects_name_too_long(client):
+    response = client.post("/items/", json={"name": "a" * 101, "price": 1.0})
+
+    assert response.status_code == 422
+
+
+def test_create_item_rejects_negative_price(client):
+    response = client.post("/items/", json={"name": "Cafe", "price": -1})
+
+    assert response.status_code == 422

@@ -1,15 +1,23 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ItemForm } from "./components/ItemForm";
 import { ItemList } from "./components/ItemList";
+import { createItem, listItems } from "./services/items";
 
 export default function App() {
   const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
 
-  function addItem({ name, price }) {
-    setItems((current) => [
-      ...current,
-      { id: crypto.randomUUID(), name, price },
-    ]);
+  useEffect(() => {
+    listItems()
+      .then(setItems)
+      .catch((error) => setLoadError(error.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  async function addItem(values) {
+    const created = await createItem(values); // lança erro se falhar
+    setItems((current) => [...current, created]);
   }
 
   return (
@@ -28,7 +36,13 @@ export default function App() {
           >
             Itens cadastrados
           </h2>
-          <ItemList items={items} />
+          {loading && <p className="text-slate-600">Carregando itens...</p>}
+          {loadError && (
+            <p role="alert" className="text-sm text-red-700">
+              {loadError}
+            </p>
+          )}
+          {!loading && !loadError && <ItemList items={items} />}
         </section>
       </div>
     </main>
